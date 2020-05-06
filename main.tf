@@ -10,7 +10,7 @@ module "vpc"{
   private_cidr = var.private_cidr
  
 }
-#module "ec2"{
-# source = "./ec2"
-# subnet_id = module.vpc.public_subnet_out
-#}
+module "ec2"{
+ source = "./ec2"
+ subnet_id = module.vpc.public_subnet_out
+}

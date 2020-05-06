@@ -27,7 +27,7 @@ resource "aws_internet_gateway" "demo_vpc_igw" {
 
 #publicsubnet
 resource "aws_subnet" "demo_vpc_public_subnet" {
-  count = length(data.aws_availability_zones.azs.names)
+  count = length(var.public_cidr)
   availability_zone = element(data.aws_availability_zones.azs.names,count.index)
   vpc_id     = aws_vpc.demo_vpc.id
   cidr_block = element(var.public_cidr,count.index)
@@ -40,11 +40,14 @@ resource "aws_subnet" "demo_vpc_public_subnet" {
 
 #private subnet
 resource "aws_subnet" "demo_vpc_private_subnet" {
+  count = length(var.private_cidr)
   vpc_id     = aws_vpc.demo_vpc.id
-  cidr_block = var.private_cidr
+  availability_zone = element(data.aws_availability_zones.azs.names,count.index)
+  cidr_block = element(var.private_cidr,count.index)
+
 
   tags = {
-    Name = "demo_vpc_private_subnet"
+    Name = "demo_vpc_private_subnet ${element(data.aws_availability_zones.azs.names,count.index)}"
   }
 }
  

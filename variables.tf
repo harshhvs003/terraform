@@ -11,5 +11,6 @@ description = "public cidr block of the subnet"
 }
 
 variable "private_cidr"{
+type = list
 description = "private block of the subnet"
 }
