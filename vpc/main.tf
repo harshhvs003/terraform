@@ -1,3 +1,10 @@
+data "aws_availability_zones" "azs" {
+}
+
+
+
+
+
 #vpc cidr
 resource "aws_vpc" "demo_vpc" {
   cidr_block = var.vpc_cidr
@@ -20,11 +27,14 @@ resource "aws_internet_gateway" "demo_vpc_igw" {
 
 #publicsubnet
 resource "aws_subnet" "demo_vpc_public_subnet" {
+  count = length(data.aws_availability_zones.azs.names)
+  availability_zone = element(data.aws_availability_zones.azs.names,count.index)
   vpc_id     = aws_vpc.demo_vpc.id
-  cidr_block = var.public_cidr
+  cidr_block = element(var.public_cidr,count.index)
   map_public_ip_on_launch = true
   tags = {
-    Name = "demo_vpc_public_subnet"
+    Name = "demo_vpc_public_subnet ${element(data.aws_availability_zones.azs.names,count.index)}"
+
   }
 }
 
@@ -54,7 +64,8 @@ resource "aws_route_table" "demo_vpc_public_rt" {
 
 #route table association
 resource "aws_route_table_association" "demo_vpc_rta" {
-  subnet_id      = aws_subnet.demo_vpc_public_subnet.id
+  count =  length(var.public_cidr)
+  subnet_id      = aws_subnet.demo_vpc_public_subnet.*.id[count.index]
   route_table_id = aws_route_table.demo_vpc_public_rt.id
 }
 
